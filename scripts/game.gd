@@ -83,19 +83,63 @@ func _build_fighter(is_player: bool) -> void:
     root.name = "Player" if is_player else "Opponent"
     root.position = Vector3(-1.8, 0.48, 0.0) if is_player else Vector3(1.8, 0.48, 0.0)
     add_child(root)
-    var main_color := PLAYER_COLOR if is_player else ENEMY_COLOR
-    var dark := main_color.darkened(0.38)
 
-    _capsule(root, Vector3(0, 0.95, 0), 0.43, 1.05, main_color)
-    _sphere(root, Vector3(0, 1.72, 0), 0.32, Color(0.64, 0.43, 0.31) if is_player else Color(0.42, 0.29, 0.23))
-    _capsule(root, Vector3(-0.43, 1.0, 0), 0.15, 0.68, dark)
-    _capsule(root, Vector3(0.43, 1.0, 0), 0.15, 0.68, dark)
-    _sphere(root, Vector3(-0.48, 1.35, 0), 0.19, main_color)
-    _sphere(root, Vector3(0.48, 1.35, 0), 0.19, main_color)
-    _capsule(root, Vector3(-0.2, 0.35, 0), 0.18, 0.62, Color(0.12, 0.13, 0.17))
-    _capsule(root, Vector3(0.2, 0.35, 0), 0.18, 0.62, Color(0.12, 0.13, 0.17))
-    _sphere(root, Vector3(-0.2, 0.06, 0.08), 0.2, Color(0.08, 0.08, 0.09))
-    _sphere(root, Vector3(0.2, 0.06, 0.08), 0.2, Color(0.08, 0.08, 0.09))
+    # Visual de boxeador estilizado: silhueta atlética, roupa e equipamento.
+    var facing := 1.0 if is_player else -1.0
+    var skin := Color(0.40, 0.24, 0.16) if is_player else Color(0.68, 0.43, 0.29)
+    var skin_shadow := skin.darkened(0.22)
+    var outfit := Color(0.05, 0.30, 0.72) if is_player else Color(0.72, 0.08, 0.10)
+    var outfit_dark := outfit.darkened(0.35)
+    var glove := Color(0.04, 0.16, 0.42) if is_player else Color(0.48, 0.025, 0.035)
+    var boot := Color(0.035, 0.04, 0.055)
+    var hair := Color(0.035, 0.025, 0.02) if is_player else Color(0.12, 0.055, 0.025)
+
+    # Tronco, pescoço e cintura.
+    _capsule(root, Vector3(0, 1.02, 0), 0.39, 0.98, skin)
+    _capsule(root, Vector3(0, 0.67, 0), 0.37, 0.48, outfit)
+    _box_child(root, Vector3(0, 0.91, 0.015), Vector3(0.66, 0.10, 0.48), outfit_dark)
+    _capsule(root, Vector3(0, 1.49, 0), 0.13, 0.30, skin_shadow)
+
+    # Ombros, braços e luvas grandes de boxe.
+    for side in [-1.0, 1.0]:
+        _sphere(root, Vector3(side * 0.39, 1.34, 0), 0.22, skin)
+        _capsule(root, Vector3(side * 0.43, 1.12, 0), 0.145, 0.48, skin)
+        _capsule(root, Vector3(side * 0.40, 0.91, 0.015), 0.13, 0.34, skin_shadow)
+        _capsule(root, Vector3(side * 0.39, 1.34, 0.10), 0.17, 0.28, glove)
+        _sphere(root, Vector3(side * 0.39, 1.48, 0.10), 0.17, glove)
+        _sphere(root, Vector3(side * 0.39, 1.25, 0.10), 0.15, glove)
+        _box_child(root, Vector3(side * 0.39, 1.34, 0.235), Vector3(0.20, 0.055, 0.025), Color(0.88, 0.88, 0.90))
+
+    # Shorts com cós e detalhes laterais.
+    _box_child(root, Vector3(0, 0.55, 0), Vector3(0.72, 0.43, 0.48), outfit)
+    _box_child(root, Vector3(0, 0.76, 0), Vector3(0.73, 0.075, 0.49), Color(0.92, 0.88, 0.72))
+    _box_child(root, Vector3(-0.30, 0.53, 0.245), Vector3(0.045, 0.30, 0.025), outfit_dark)
+    _box_child(root, Vector3(0.30, 0.53, 0.245), Vector3(0.045, 0.30, 0.025), outfit_dark)
+
+    # Pernas, joelhos e botas.
+    for side in [-1.0, 1.0]:
+        _capsule(root, Vector3(side * 0.19, 0.27, 0), 0.145, 0.55, skin)
+        _sphere(root, Vector3(side * 0.19, 0.34, 0.015), 0.15, skin_shadow)
+        _capsule(root, Vector3(side * 0.19, 0.105, 0.035), 0.145, 0.25, boot)
+        _box_child(root, Vector3(side * 0.19, 0.055, 0.13), Vector3(0.28, 0.10, 0.40), boot)
+        _box_child(root, Vector3(side * 0.19, 0.16, 0.19), Vector3(0.23, 0.035, 0.025), Color(0.78, 0.78, 0.82))
+
+    # Cabeça, orelhas e cabelo.
+    _sphere(root, Vector3(0, 1.78, 0), 0.285, skin)
+    _sphere(root, Vector3(-facing * 0.265, 1.79, 0), 0.075, skin_shadow)
+    _sphere(root, Vector3(0, 1.96, -0.015), 0.235, hair)
+    _sphere(root, Vector3(-0.13, 1.91, 0.13), 0.13, hair)
+    _sphere(root, Vector3(0.13, 1.91, 0.13), 0.13, hair)
+
+    # Rosto voltado para o adversário: sobrancelha, olhos, nariz e boca.
+    var face_x := facing * 0.235
+    for side in [-1.0, 1.0]:
+        _sphere(root, Vector3(face_x, 1.82, side * 0.105), 0.035, Color(0.96, 0.91, 0.82))
+        _sphere(root, Vector3(face_x + facing * 0.025, 1.82, side * 0.105), 0.018, Color(0.08, 0.045, 0.025))
+        _box_child(root, Vector3(face_x, 1.88, side * 0.105), Vector3(0.035, 0.035, 0.10), hair)
+    _sphere(root, Vector3(facing * 0.285, 1.75, 0), 0.045, skin_shadow)
+    _box_child(root, Vector3(facing * 0.267, 1.68, 0), Vector3(0.035, 0.025, 0.12), Color(0.16, 0.045, 0.035))
+
     if is_player:
         player = root
     else:
