@@ -145,6 +145,15 @@ func _build_fighter(is_player: bool) -> void:
     else:
         enemy = root
 
+func _box_child(parent: Node3D, pos: Vector3, size: Vector3, color: Color) -> void:
+    var mesh := BoxMesh.new()
+    mesh.size = size
+    var instance := MeshInstance3D.new()
+    instance.mesh = mesh
+    instance.position = pos
+    instance.material_override = _material(color)
+    parent.add_child(instance)
+
 func _box(pos: Vector3, size: Vector3, color: Color) -> void:
     var mesh := BoxMesh.new()
     mesh.size = size
